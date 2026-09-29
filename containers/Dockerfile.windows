@@ -1,0 +1,18 @@
+# syntax=docker/dockerfile:1
+
+# Toolchain versions follow godotengine/build-containers@bc0a7d9 for Godot 4.5.
+ARG FEDORA_VERSION=42
+FROM fedora:${FEDORA_VERSION}
+
+ARG SCONS_VERSION=4.9.1
+
+WORKDIR /workspace
+
+RUN dnf -y install --setopt=install_weak_deps=False \
+        bash binutils bzip2 curl file findutils gettext git make patch pkgconf-pkg-config \
+        python3-pip unzip which xz zip \
+        mingw64-gcc mingw64-gcc-c++ mingw64-winpthreads-static && \
+    dnf clean all && \
+    python3 -m pip install --no-cache-dir "scons==${SCONS_VERSION}"
+
+CMD ["/bin/bash"]
