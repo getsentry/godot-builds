@@ -62,8 +62,33 @@ add_build_target() {
 }
 
 parse_build_arguments() {
+    GODOT_BUILD_NAME="custom"
+    BUILD_STATUS=""
+
     while (($# > 0)); do
         case "$1" in
+            --build-name)
+                if (($# < 2)); then
+                    die "Option '--build-name' requires a value"
+                fi
+                GODOT_BUILD_NAME=$2
+                shift 2
+                ;;
+            --build-name=*)
+                GODOT_BUILD_NAME=${1#*=}
+                shift
+                ;;
+            --status)
+                if (($# < 2)); then
+                    die "Option '--status' requires a value"
+                fi
+                BUILD_STATUS=$2
+                shift 2
+                ;;
+            --status=*)
+                BUILD_STATUS=${1#*=}
+                shift
+                ;;
             --target)
                 if (($# < 2)); then
                     die "Option '--target' requires a value"
@@ -87,6 +112,9 @@ parse_build_arguments() {
         esac
     done
 
+    if [[ -z $GODOT_BUILD_NAME ]]; then
+        die "Option '--build-name' requires a non-empty value"
+    fi
     if ((${#BUILD_TARGETS[@]} == 0)); then
         BUILD_TARGETS=(editor template_debug template_release)
     fi
@@ -132,7 +160,15 @@ run_scons_build() {
     start_log_group "$build_name build log"
 
     local exit_code=0
-    "$SCONS" "platform=$platform" "target=$target" "arch=$arch" "$@" || exit_code=$?
+    (
+        export BUILD_NAME="$GODOT_BUILD_NAME"
+        if [[ -n $BUILD_STATUS ]]; then
+            export GODOT_VERSION_STATUS="$BUILD_STATUS"
+        else
+            unset GODOT_VERSION_STATUS
+        fi
+        "$SCONS" "platform=$platform" "target=$target" "arch=$arch" "$@"
+    ) || exit_code=$?
 
     end_log_group
 
