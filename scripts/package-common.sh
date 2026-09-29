@@ -10,6 +10,29 @@ get_godot_release() {
     printf '%s\n' "$release"
 }
 
+parse_package_arguments() {
+    while (($# > 0)); do
+        case "$1" in
+            --status)
+                if (($# < 2)); then
+                    die "Option '--status' requires a value"
+                fi
+                PACKAGE_STATUS=$2
+                shift 2
+                ;;
+            --status=*)
+                PACKAGE_STATUS=${1#*=}
+                shift
+                ;;
+            *) die "Unknown option '$1'" ;;
+        esac
+    done
+
+    if [[ -z $PACKAGE_STATUS ]]; then
+        die "Option '--status' requires a non-empty value"
+    fi
+}
+
 require_path() {
     if [[ ! -e $1 ]]; then
         die "Required path '$1' was not found"

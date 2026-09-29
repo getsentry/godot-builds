@@ -39,6 +39,13 @@ Package the staged artifacts from the repository root:
 ./scripts/package-macos.sh
 ```
 
+Package names use the status from the pinned Godot tag by default. Pass the
+same custom status used for the build when packaging custom releases:
+
+```bash
+./scripts/package-linux.sh --status sentry.0
+```
+
 Each platform produces an editor archive and its template archives under
 `packages/<version>/`. Every archive has a matching `.debug-symbols.zip` archive
 containing its debug files and source bundles.

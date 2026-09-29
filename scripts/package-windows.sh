@@ -14,10 +14,12 @@ source "$SCRIPT_DIR/package-common.sh"
 
 GODOT_RELEASE=$(get_godot_release "$GODOT_DIR")
 GODOT_VERSION=${GODOT_RELEASE%%-*}
+PACKAGE_STATUS=${GODOT_RELEASE#*-}
+parse_package_arguments "$@"
 ARTIFACT_DIR="$REPO_ROOT/artifacts/$GODOT_VERSION/windows"
 PACKAGE_DIR="$REPO_ROOT/packages/$GODOT_VERSION"
 STAGING_ROOT="$PACKAGE_DIR/.staging-windows"
-PACKAGE_BASENAME="Godot_v$GODOT_RELEASE"
+PACKAGE_BASENAME="Godot_v$GODOT_VERSION-$PACKAGE_STATUS"
 
 trap 'rm -rf "$STAGING_ROOT"' EXIT
 
