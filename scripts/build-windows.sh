@@ -3,41 +3,55 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-readonly SCRIPT_DIR
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
-readonly REPO_ROOT
-readonly GODOT_DIR="$REPO_ROOT/godot"
-readonly GODOT_PLATFORM="windows"
-readonly TARGET_ARCH="x86_64"
-readonly SCONS="${SCONS:-scons}"
+GODOT_DIR="$REPO_ROOT/godot"
+GODOT_PLATFORM="windows"
+ARTIFACT_PLATFORM="windows"
+TARGET_ARCH="x86_64"
+SCONS="${SCONS:-scons}"
 
-readonly -a SCONS_ARGS=(
+SCONS_ARGS=(
     "-Q"
     "-s"
     "production=yes"
     "debug_symbols=yes"
     "separate_debug_symbols=yes"
-    "$@"
 )
+BUILD_TARGETS=()
 
 source "$SCRIPT_DIR/build-common.sh"
+
+parse_build_arguments "$@"
+GODOT_VERSION=$(get_godot_version "$GODOT_DIR")
+ARTIFACT_DIR="$REPO_ROOT/artifacts/$GODOT_VERSION/$ARTIFACT_PLATFORM"
 
 main() {
     require_command "$SCONS"
     cd "$GODOT_DIR"
 
-    # Building editor and templates.
+    # Building selected targets.
 
     local failed_targets=()
     local target
 
-    for target in editor template_debug template_release; do
+    for target in "${BUILD_TARGETS[@]}"; do
         if ! run_scons_build "$GODOT_PLATFORM" "$target" "$TARGET_ARCH" "${SCONS_ARGS[@]}"; then
             failed_targets+=("$target")
         fi
     done
 
-    print_build_summary "Windows" "${failed_targets[@]}"
+    print_build_summary "Windows" "${failed_targets[@]+"${failed_targets[@]}"}"
+    exit_if "${#failed_targets[@]}"
+
+    # Moving build artifacts.
+
+    log_step "Staging build artifacts..."
+
+    for target in "${BUILD_TARGETS[@]}"; do
+        move_build_artifacts \
+            "$ARTIFACT_DIR/$target/$TARGET_ARCH" \
+            "bin/godot.$GODOT_PLATFORM.$target.$TARGET_ARCH"*
+    done
 }
 
 main
