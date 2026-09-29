@@ -12,6 +12,8 @@ readonly TARGET_ARCH="x86_64"
 readonly SCONS="${SCONS:-scons}"
 
 readonly -a SCONS_ARGS=(
+    "-Q"
+    "-s"
     "production=yes"
     "debug_symbols=yes"
     "separate_debug_symbols=yes"

@@ -12,6 +12,8 @@ readonly UNIVERSAL_ARCH="universal"
 readonly SCONS="${SCONS:-scons}"
 
 readonly -a SCONS_ARGS=(
+    "-Q"
+    "-s"
     "production=yes"
     "debug_symbols=yes"
     "separate_debug_symbols=yes"
