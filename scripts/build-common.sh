@@ -167,6 +167,8 @@ run_scons_build() {
         else
             unset GODOT_VERSION_STATUS
         fi
+        # Discard earlier variants so staging only selects outputs from this build.
+        rm -rf -- "bin/godot.$platform.$target"*".$arch"* || exit $?
         "$SCONS" "platform=$platform" "target=$target" "arch=$arch" "$@"
     ) || exit_code=$?
 

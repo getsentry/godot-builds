@@ -50,7 +50,7 @@ main() {
     for target in "${BUILD_TARGETS[@]}"; do
         move_build_artifacts \
             "$ARTIFACT_DIR/$target/$TARGET_ARCH" \
-            "bin/godot.$GODOT_PLATFORM.$target.$TARGET_ARCH"*
+            "bin/godot.$GODOT_PLATFORM.$target"*".$TARGET_ARCH"*
     done
 }
 

@@ -54,7 +54,7 @@ main() {
         for arch in x86_64 arm64; do
             move_build_artifacts \
                 "$ARTIFACT_DIR/$target/$arch" \
-                "bin/godot.$GODOT_PLATFORM.$target.$arch"*
+                "bin/godot.$GODOT_PLATFORM.$target"*".$arch"*
         done
     done
 }
