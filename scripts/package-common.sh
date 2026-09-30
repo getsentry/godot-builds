@@ -45,7 +45,7 @@ get_artifact_binary() {
     for path in "$artifact_dir"/godot.*"$extension"; do
         [[ -f $path ]] || continue
         case "$path" in
-            *.debugsymbols | *.console.exe) continue ;;
+            *.debugsymbols | *.console.exe | *.src.zip) continue ;;
         esac
         [[ -z $binary_path ]] ||
             die "Multiple build binaries were found in '$artifact_dir'"
