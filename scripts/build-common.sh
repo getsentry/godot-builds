@@ -105,7 +105,30 @@ move_build_artifacts() {
     mkdir -p "$artifact_dir"
     mv "$@" "$artifact_dir/" || die "Failed to move build artifacts to '$artifact_dir'"
 
-    log_success "Staged $artifact_path"
+    log_info "Staged $artifact_path"
+}
+
+bundle_sources() {
+    local sentry_cli="${SENTRY_CLI:-sentry-cli}"
+    require_command "$sentry_cli"
+
+    local debug_artifacts=()
+    local path
+    for path in bin/*.debugsymbols bin/*.pdb bin/*.dSYM; do
+        [[ -e $path ]] || continue
+        debug_artifacts+=("$path")
+    done
+
+    if ((${#debug_artifacts[@]} == 0)); then
+        die "No debug artifacts were found for source bundling"
+    fi
+
+    log_substep "Creating source bundles..."
+    "$sentry_cli" debug-files bundle-sources "${debug_artifacts[@]}" --output bin ||
+        die "Failed to bundle build sources"
+
+    local source_bundles=(bin/*.src.zip)
+    [[ -f ${source_bundles[0]} ]] || die "No source bundles were created"
 }
 
 run_scons_build() {
@@ -136,6 +159,8 @@ run_scons_build() {
         if [[ $platform == "windows" ]]; then
             rm -f -- bin/*.lib bin/*.exp || exit $?
         fi
+
+        bundle_sources
 
         log_substep "Staging build artifacts..."
         move_build_artifacts "$ARTIFACT_DIR/$target/$arch" bin/*

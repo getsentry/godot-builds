@@ -27,6 +27,6 @@ By default, each script builds the editor and both export templates. Pass
 
 The available targets are `editor`, `template_debug`, and `template_release`.
 
-Successful builds move their binaries and debug symbols out of `godot/bin` and
-into `artifacts/<version>/<platform>/<target>/<architecture>/`. This layout lets
-CI jobs build targets independently and merge their artifacts afterward.
+Successful builds place binaries, debug symbols, and source bundles into
+`artifacts/<version>/<platform>/<target>/<architecture>/`. This layout lets CI
+jobs build targets independently and merge their artifacts afterward.

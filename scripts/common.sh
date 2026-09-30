@@ -1,20 +1,10 @@
 #!/usr/bin/env bash
 
-log_step() {
-    printf '\n\033[1;97m==> \033[1;34m%s\033[0m\n' "$1"
-}
-
-log_substep() {
-    printf '\033[1;97m==> %s\033[0m\n' "$1"
-}
-
-log_success() {
-    printf '\033[1;97m==> \033[1;92m%s\033[0m\n' "$1"
-}
-
-log_error() {
-    printf '\033[1;91m%s\033[0m\n' "$1" >&2
-}
+log_info() { printf '%s\n' "$1"; }
+log_step() { printf '\n\033[1;97m==> \033[1;34m%s\033[0m\n' "$1"; }
+log_substep() { printf '\033[1;97m==> %s\033[0m\n' "$1"; }
+log_success() { printf '\033[1;97m==> \033[1;92m%s\033[0m\n' "$1"; }
+log_error() { printf '\033[1;91m%s\033[0m\n' "$1" >&2; }
 
 die() {
     log_error "$1"
