@@ -9,7 +9,7 @@ TARGET_ARCH="x86_64"
 ZIP="${ZIP:-zip}"
 SENTRY_CLI="${SENTRY_CLI:-sentry-cli}"
 
-source "$SCRIPT_DIR/build-common.sh"
+source "$SCRIPT_DIR/common.sh"
 source "$SCRIPT_DIR/package-common.sh"
 
 GODOT_RELEASE=$(get_godot_release "$GODOT_DIR")
