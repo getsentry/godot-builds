@@ -4,7 +4,7 @@ Build the pinned Godot source from the repository root:
 
 ```bash
 ./scripts/build-linux.sh
-./scripts/build-windows.sh use_mingw=yes
+./scripts/build-windows.sh
 ./scripts/build-macos.sh
 ```
 
