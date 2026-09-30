@@ -59,7 +59,9 @@ main() {
 
     log_step "Packaging Windows editor..."
     stage_package_entry "$editor_binary" "$editor_staging_dir/$editor_name"
-    stage_package_entry "$editor_console" "$editor_staging_dir/$editor_console_name"
+    if [[ -f $editor_console ]]; then
+        stage_package_entry "$editor_console" "$editor_staging_dir/$editor_console_name"
+    fi
     create_zip_archive "$PACKAGE_DIR/$editor_name.zip" "$editor_staging_dir"
     rm -rf "$editor_staging_dir"
 
@@ -89,7 +91,9 @@ main() {
 
         log_step "Packaging Windows $target template..."
         stage_package_entry "$template_binary" "$template_staging_dir/$template_name"
-        stage_package_entry "$template_console" "$template_staging_dir/$template_console_name"
+        if [[ -f $template_console ]]; then
+            stage_package_entry "$template_console" "$template_staging_dir/$template_console_name"
+        fi
         create_zip_archive "$PACKAGE_DIR/$package_name.zip" "$template_staging_dir"
         rm -rf "$template_staging_dir"
 
