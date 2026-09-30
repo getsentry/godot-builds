@@ -8,9 +8,7 @@ Build the pinned Godot source from the repository root:
 ./scripts/build-macos.sh
 ```
 
-Linux and Windows builds can run in a Linux container with the appropriate
-toolchain available on `PATH`. The macOS script runs natively with Xcode command
-line tools. Additional arguments are forwarded to every SCons invocation.
+Additional arguments are forwarded to every SCons invocation.
 
 The build name defaults to `custom`. Pass `--status` to override the version
 status from the Godot source:
