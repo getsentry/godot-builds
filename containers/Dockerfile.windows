@@ -15,4 +15,12 @@ RUN dnf -y install --setopt=install_weak_deps=False \
     dnf clean all && \
     python3 -m pip install --no-cache-dir "scons==${SCONS_VERSION}"
 
+ARG SENTRY_CLI_VERSION=3.8.0
+
+RUN curl --fail --location --retry 3 \
+        --output /usr/local/bin/sentry-cli \
+        "https://github.com/getsentry/sentry-cli/releases/download/${SENTRY_CLI_VERSION}/sentry-cli-Linux-x86_64" && \
+    chmod 0755 /usr/local/bin/sentry-cli && \
+    sentry-cli --version
+
 CMD ["/bin/bash"]
