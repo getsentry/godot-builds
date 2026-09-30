@@ -4,6 +4,10 @@ log_step() {
     printf '\n\033[1;97m==> \033[1;34m%s\033[0m\n' "$1"
 }
 
+log_substep() {
+    printf '\033[1;97m==> %s\033[0m\n' "$1"
+}
+
 log_success() {
     printf '\033[1;97m==> \033[1;92m%s\033[0m\n' "$1"
 }
@@ -157,7 +161,6 @@ run_scons_build() {
 
     local build_name="$target.$arch"
     log_step "Building $build_name..."
-    start_log_group "$build_name build log"
 
     local exit_code=0
     (
@@ -167,20 +170,31 @@ run_scons_build() {
         else
             unset GODOT_VERSION_STATUS
         fi
-        # Discard earlier variants so staging only selects outputs from this build.
-        rm -rf -- "bin/godot.$platform.$target"*".$arch"* || exit $?
-        "$SCONS" "platform=$platform" "target=$target" "arch=$arch" "$@"
+
+        rm -rf -- bin || exit $?
+
+        start_log_group "$build_name build log"
+        "$SCONS" "platform=$platform" "target=$target" "arch=$arch" "$@" || exit_code=$?
+        end_log_group
+        ((exit_code == 0)) || exit "$exit_code"
+
+        if [[ $platform == "windows" ]]; then
+            rm -f -- bin/*.lib bin/*.exp || exit $?
+        fi
+
+        log_substep "Staging build artifacts..."
+        move_build_artifacts "$ARTIFACT_DIR/$target/$arch" bin/*
     ) || exit_code=$?
 
-    end_log_group
+    rm -rf -- bin || die "Failed to clean the Godot bin directory"
 
     if ((exit_code == 0)); then
         log_success "$build_name completed successfully"
         return 0
+    else
+        log_error "$build_name failed (exit code: $exit_code)"
+        return "$exit_code"
     fi
-
-    log_error "$build_name failed (exit code: $exit_code)"
-    return "$exit_code"
 }
 
 print_build_summary() {

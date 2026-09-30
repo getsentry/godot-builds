@@ -14,6 +14,7 @@ SCONS_ARGS=(
     "-Q"
     "-s"
     "production=yes"
+    "redirect_build_objects=no"
     "debug_symbols=yes"
     "separate_debug_symbols=yes"
 )
@@ -29,8 +30,6 @@ main() {
     require_command "$SCONS"
     cd "$GODOT_DIR"
 
-    # Building selected targets.
-
     local failed_targets=()
     local target
 
@@ -42,16 +41,6 @@ main() {
 
     print_build_summary "Linux" "${failed_targets[@]+"${failed_targets[@]}"}"
     exit_if "${#failed_targets[@]}"
-
-    # Moving build artifacts.
-
-    log_step "Staging build artifacts..."
-
-    for target in "${BUILD_TARGETS[@]}"; do
-        move_build_artifacts \
-            "$ARTIFACT_DIR/$target/$TARGET_ARCH" \
-            "bin/godot.$GODOT_PLATFORM.$target"*".$TARGET_ARCH"*
-    done
 }
 
 main
