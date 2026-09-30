@@ -20,6 +20,7 @@ SCONS_ARGS=(
 )
 BUILD_TARGETS=()
 
+source "$SCRIPT_DIR/common.sh"
 source "$SCRIPT_DIR/build-common.sh"
 
 parse_build_arguments "$@"

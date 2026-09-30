@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
 GODOT_DIR="$REPO_ROOT/godot"
 
-source "$SCRIPT_DIR/build-common.sh"
+source "$SCRIPT_DIR/common.sh"
 
 main() {
     require_command "git"
