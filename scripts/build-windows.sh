@@ -17,6 +17,8 @@ SCONS_ARGS=(
     "redirect_build_objects=no"
     "debug_symbols=yes"
     "separate_debug_symbols=yes"
+    # Ensure each binary and its debug symbols include a build ID so they can be matched.
+    "linkflags=-Wl,--build-id=sha1"
 )
 BUILD_TARGETS=()
 
