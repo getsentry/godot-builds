@@ -6,7 +6,6 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
 GODOT_DIR="$REPO_ROOT/godot"
 ZIP="${ZIP:-zip}"
-SENTRY_CLI="${SENTRY_CLI:-sentry-cli}"
 LIPO="${LIPO:-lipo}"
 
 source "$SCRIPT_DIR/common.sh"
@@ -38,7 +37,6 @@ create_universal_binary() {
 main() {
     require_command "mktemp"
     require_command "$LIPO"
-    require_command "$SENTRY_CLI"
     require_command "$ZIP"
 
     # Packaging editor.

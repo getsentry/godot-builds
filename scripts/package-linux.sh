@@ -7,7 +7,6 @@ REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
 GODOT_DIR="$REPO_ROOT/godot"
 TARGET_ARCH="x86_64"
 ZIP="${ZIP:-zip}"
-SENTRY_CLI="${SENTRY_CLI:-sentry-cli}"
 
 source "$SCRIPT_DIR/common.sh"
 source "$SCRIPT_DIR/package-common.sh"
@@ -25,7 +24,6 @@ trap 'rm -rf "$STAGING_ROOT"' EXIT
 
 main() {
     require_command "mktemp"
-    require_command "$SENTRY_CLI"
     require_command "$ZIP"
 
     # Packaging editor.

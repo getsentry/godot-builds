@@ -115,13 +115,20 @@ create_debug_package() {
     staging_dir=$(create_staging_directory)
 
     local debug_path
+    local source_bundles=()
+    local source_bundle
     for debug_path in "$@"; do
         stage_package_entry "$debug_path" "$staging_dir/$(basename -- "$debug_path")"
-    done
 
-    log_substep "Creating source bundles..."
-    "$SENTRY_CLI" debug-files bundle-sources "$@" --output "$staging_dir" ||
-        die "Failed to bundle sources for '$archive_path'"
+        source_bundles=("${debug_path%/*}"/*.src.zip)
+        [[ -f ${source_bundles[0]} ]] ||
+            die "No source bundles were found in '${debug_path%/*}'"
+        for source_bundle in "${source_bundles[@]}"; do
+            if [[ ! -e $staging_dir/${source_bundle##*/} ]]; then
+                stage_package_entry "$source_bundle" "$staging_dir/${source_bundle##*/}"
+            fi
+        done
+    done
 
     create_zip_archive "$archive_path" "$staging_dir"
     rm -rf "$staging_dir"
