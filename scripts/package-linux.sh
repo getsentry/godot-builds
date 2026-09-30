@@ -30,7 +30,8 @@ main() {
 
     # Packaging editor.
 
-    local editor_binary="$ARTIFACT_DIR/editor/$TARGET_ARCH/godot.linuxbsd.editor.$TARGET_ARCH"
+    local editor_binary
+    editor_binary=$(get_artifact_binary "$ARTIFACT_DIR/editor/$TARGET_ARCH")
     local editor_name="${PACKAGE_BASENAME}_linux.$TARGET_ARCH"
 
     log_step "Packaging Linux editor..."
@@ -51,7 +52,7 @@ main() {
 
     for target in debug release; do
         template_name="linux_${target}.$TARGET_ARCH"
-        template_binary="$ARTIFACT_DIR/template_$target/$TARGET_ARCH/godot.linuxbsd.template_$target.$TARGET_ARCH"
+        template_binary=$(get_artifact_binary "$ARTIFACT_DIR/template_$target/$TARGET_ARCH")
         package_name="${PACKAGE_BASENAME}_$template_name"
 
         log_step "Packaging Linux $target template..."

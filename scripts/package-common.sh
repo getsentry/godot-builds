@@ -39,6 +39,30 @@ require_path() {
     fi
 }
 
+# Godot build options may change binary filenames, so packaging discovers them
+# without hard-coding explicit naming variation rules.
+get_artifact_binary() {
+    local artifact_dir=$1
+    local extension=${2:-}
+    local binary_path=""
+    local path
+
+    require_path "$artifact_dir"
+    for path in "$artifact_dir"/godot.*"$extension"; do
+        [[ -f $path ]] || continue
+        case "$path" in
+            *.debugsymbols | *.console.exe) continue ;;
+        esac
+        [[ -z $binary_path ]] ||
+            die "Multiple build binaries were found in '$artifact_dir'"
+        binary_path=$path
+    done
+
+    [[ -n $binary_path ]] ||
+        die "No build binary was found in '$artifact_dir'"
+    printf '%s\n' "$binary_path"
+}
+
 create_staging_directory() {
     mkdir -p "$STAGING_ROOT"
     mktemp -d "$STAGING_ROOT/package.XXXXXX" ||

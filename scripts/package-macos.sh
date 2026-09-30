@@ -43,8 +43,9 @@ main() {
 
     # Packaging editor.
 
-    local editor_arm64="$ARTIFACT_DIR/editor/arm64/godot.macos.editor.arm64"
-    local editor_x86_64="$ARTIFACT_DIR/editor/x86_64/godot.macos.editor.x86_64"
+    local editor_arm64 editor_x86_64
+    editor_arm64=$(get_artifact_binary "$ARTIFACT_DIR/editor/arm64")
+    editor_x86_64=$(get_artifact_binary "$ARTIFACT_DIR/editor/x86_64")
     local editor_name="${PACKAGE_BASENAME}_macos.universal"
     local editor_staging_dir
     local editor_app
@@ -73,10 +74,11 @@ main() {
     local template_staging_dir
     local template_app
     local template_executable_dir
-    local debug_arm64="$ARTIFACT_DIR/template_debug/arm64/godot.macos.template_debug.arm64"
-    local debug_x86_64="$ARTIFACT_DIR/template_debug/x86_64/godot.macos.template_debug.x86_64"
-    local release_arm64="$ARTIFACT_DIR/template_release/arm64/godot.macos.template_release.arm64"
-    local release_x86_64="$ARTIFACT_DIR/template_release/x86_64/godot.macos.template_release.x86_64"
+    local debug_arm64 debug_x86_64 release_arm64 release_x86_64
+    debug_arm64=$(get_artifact_binary "$ARTIFACT_DIR/template_debug/arm64")
+    debug_x86_64=$(get_artifact_binary "$ARTIFACT_DIR/template_debug/x86_64")
+    release_arm64=$(get_artifact_binary "$ARTIFACT_DIR/template_release/arm64")
+    release_x86_64=$(get_artifact_binary "$ARTIFACT_DIR/template_release/x86_64")
 
     template_staging_dir=$(create_staging_directory)
     template_app="$template_staging_dir/macos_template.app"

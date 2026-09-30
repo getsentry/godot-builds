@@ -50,8 +50,9 @@ main() {
     # Packaging editor.
 
     local editor_dir="$ARTIFACT_DIR/editor/$TARGET_ARCH"
-    local editor_binary="$editor_dir/godot.windows.editor.$TARGET_ARCH.exe"
-    local editor_console="$editor_dir/godot.windows.editor.$TARGET_ARCH.console.exe"
+    local editor_binary
+    editor_binary=$(get_artifact_binary "$editor_dir" ".exe")
+    local editor_console="${editor_binary%.exe}.console.exe"
     local editor_name="${PACKAGE_BASENAME}_win64.exe"
     local editor_console_name="${PACKAGE_BASENAME}_win64_console.exe"
     local editor_staging_dir
@@ -81,8 +82,8 @@ main() {
 
     for target in debug release; do
         template_dir="$ARTIFACT_DIR/template_$target/$TARGET_ARCH"
-        template_binary="$template_dir/godot.windows.template_$target.$TARGET_ARCH.exe"
-        template_console="$template_dir/godot.windows.template_$target.$TARGET_ARCH.console.exe"
+        template_binary=$(get_artifact_binary "$template_dir" ".exe")
+        template_console="${template_binary%.exe}.console.exe"
         template_name="windows_${target}_$TARGET_ARCH.exe"
         template_console_name="windows_${target}_${TARGET_ARCH}_console.exe"
         package_name="${PACKAGE_BASENAME}_windows_${target}_$TARGET_ARCH"
