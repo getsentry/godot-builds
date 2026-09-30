@@ -33,12 +33,6 @@ parse_package_arguments() {
     fi
 }
 
-require_path() {
-    if [[ ! -e $1 ]]; then
-        die "Required path '$1' was not found"
-    fi
-}
-
 # Godot build options may change binary filenames, so packaging discovers them
 # without hard-coding explicit naming variation rules.
 get_artifact_binary() {
