@@ -184,7 +184,7 @@ run_scons_build() {
         rm -rf -- bin || exit $?
 
         start_log_group "$build_name build log"
-        "$SCONS" "platform=$platform" "target=$target" "arch=$arch" "$@" || exit_code=$?
+        "$SCONS" "$@" "platform=$platform" "target=$target" "arch=$arch" || exit_code=$?
         end_log_group
         ((exit_code == 0)) || exit "$exit_code"
 
