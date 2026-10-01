@@ -10,6 +10,24 @@ DEFAULT_SCONS_ARGS=(
     "separate_debug_symbols=yes"
 )
 
+usage() {
+    cat <<EOF
+Usage: ${0##*/} [options] [SCons arguments]
+
+Build Godot editors and export templates for $ARTIFACT_PLATFORM.
+
+Options:
+  -h, --help          Show this help and exit.
+  --build-name NAME   Set the build name (default: custom).
+  --status STATUS     Override the version status from the Godot source.
+  --target TARGET     Build editor, template_debug, or template_release.
+                      Repeat to select multiple targets; defaults to all three.
+  --                  Forward remaining arguments directly to SCons.
+
+Additional SCons arguments are passed to every build invocation.
+EOF
+}
+
 add_build_target() {
     local requested_target=$1
     local target
@@ -36,6 +54,10 @@ parse_build_arguments() {
 
     while (($# > 0)); do
         case "$1" in
+            -h | --help)
+                usage
+                exit 0
+                ;;
             --build-name)
                 if (($# < 2)); then
                     die "Option '--build-name' requires a value"

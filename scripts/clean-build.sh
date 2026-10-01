@@ -8,7 +8,29 @@ GODOT_DIR="$REPO_ROOT/godot"
 
 source "$SCRIPT_DIR/common.sh"
 
+usage() {
+    cat <<EOF
+Usage: ${0##*/} [-h | --help]
+
+Reset the Godot submodule to the pinned revision and remove generated and
+untracked files, including local changes inside the submodule.
+
+Options:
+  -h, --help   Show this help and exit.
+EOF
+}
+
 main() {
+    if (($# > 0)); then
+        case "$1" in
+            -h | --help)
+                usage
+                return
+                ;;
+            *) die "Unknown option '$1'" ;;
+        esac
+    fi
+
     require_command "git"
 
     local godot_revision
@@ -23,4 +45,4 @@ main() {
     log_success "Godot build directory cleaned successfully"
 }
 
-main
+main "$@"
