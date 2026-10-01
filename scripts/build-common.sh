@@ -4,6 +4,7 @@ DEFAULT_SCONS_ARGS=(
     "-Q"
     "-s"
     "production=yes"
+    "progress=no"
     "redirect_build_objects=no"
     "debug_symbols=yes"
     "separate_debug_symbols=yes"
