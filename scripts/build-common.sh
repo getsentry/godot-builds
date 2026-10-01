@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+DEFAULT_SCONS_ARGS=(
+    "-Q"
+    "-s"
+    "production=yes"
+    "redirect_build_objects=no"
+    "debug_symbols=yes"
+    "separate_debug_symbols=yes"
+)
+
 add_build_target() {
     local requested_target=$1
     local target

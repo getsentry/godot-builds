@@ -10,18 +10,11 @@ ARTIFACT_PLATFORM="windows"
 TARGET_ARCH="x86_64"
 SCONS="${SCONS:-scons}"
 
-SCONS_ARGS=(
-    "-Q"
-    "-s"
-    "production=yes"
-    "redirect_build_objects=no"
-    "debug_symbols=yes"
-    "separate_debug_symbols=yes"
-)
-BUILD_TARGETS=()
-
 source "$SCRIPT_DIR/common.sh"
 source "$SCRIPT_DIR/build-common.sh"
+
+SCONS_ARGS=("${DEFAULT_SCONS_ARGS[@]}")
+BUILD_TARGETS=()
 
 parse_build_arguments "$@"
 GODOT_VERSION=$(get_godot_version "$GODOT_DIR")
