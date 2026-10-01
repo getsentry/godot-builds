@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Reset the Godot submodule and remove local changes and generated files.
+# Run this script with --help for options.
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"

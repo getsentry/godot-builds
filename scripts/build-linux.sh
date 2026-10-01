@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Build Godot editors and export templates for Linux x86_64.
+# Run this script with --help for options.
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
