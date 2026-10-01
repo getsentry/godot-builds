@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Package macOS universal Godot apps with matching debug symbols and source bundles.
+# Run this script with --help for options.
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
@@ -11,10 +14,10 @@ LIPO="${LIPO:-lipo}"
 source "$SCRIPT_DIR/common.sh"
 source "$SCRIPT_DIR/package-common.sh"
 
+parse_package_arguments "$@"
 GODOT_RELEASE=$(get_godot_release "$GODOT_DIR")
 GODOT_VERSION=${GODOT_RELEASE%%-*}
-PACKAGE_STATUS=${GODOT_RELEASE#*-}
-parse_package_arguments "$@"
+PACKAGE_STATUS=${PACKAGE_STATUS:-${GODOT_RELEASE#*-}}
 ARTIFACT_DIR="$REPO_ROOT/artifacts/$GODOT_VERSION/macos"
 PACKAGE_DIR="$REPO_ROOT/packages/$GODOT_VERSION"
 STAGING_ROOT="$PACKAGE_DIR/.staging-macos"

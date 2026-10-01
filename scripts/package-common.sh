@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+usage() {
+    cat <<EOF
+Usage: ${0##*/} [options]
+
+Package staged Godot editors and export templates into binary and debug-symbol
+ZIP archives under packages/<version>/.
+
+Options:
+  -h, --help        Show this help and exit.
+  --status STATUS   Set the package version status (default: pinned Godot tag).
+EOF
+}
+
 get_godot_release() {
     local godot_dir=$1
     local release
@@ -11,24 +24,33 @@ get_godot_release() {
 }
 
 parse_package_arguments() {
+    PACKAGE_STATUS=""
+    local status_set=false
+
     while (($# > 0)); do
         case "$1" in
+            -h | --help)
+                usage
+                exit 0
+                ;;
             --status)
                 if (($# < 2)); then
                     die "Option '--status' requires a value"
                 fi
                 PACKAGE_STATUS=$2
+                status_set=true
                 shift 2
                 ;;
             --status=*)
                 PACKAGE_STATUS=${1#*=}
+                status_set=true
                 shift
                 ;;
             *) die "Unknown option '$1'" ;;
         esac
     done
 
-    if [[ -z $PACKAGE_STATUS ]]; then
+    if [[ $status_set == true && -z $PACKAGE_STATUS ]]; then
         die "Option '--status' requires a non-empty value"
     fi
 }
