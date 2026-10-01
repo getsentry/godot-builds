@@ -1,0 +1,188 @@
+name: Build Godot
+
+on:
+  workflow_dispatch:
+    inputs:
+      status:
+        description: Godot version status
+        required: true
+        default: sentry.0
+        type: string
+      container_tag:
+        description: Published Linux toolchain tag (4.5-latest or sha-<commit>)
+        required: true
+        default: 4.5-latest
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  BUILD_NAME: sentry
+  PACKAGE_STATUS: ${{ inputs.status }}
+  CONTAINER_TAG: ${{ inputs.container_tag }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }} ${{ matrix.target }}
+    runs-on: ${{ matrix.platform == 'windows' && 'windows-latest' || matrix.platform == 'macos' && 'macos-latest' || 'ubuntu-latest' }}
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [linux, windows, macos]
+        target: [editor, template_debug, template_release]
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      BUILD_TARGET: ${{ matrix.target }}
+
+    steps:
+      - name: Validate inputs
+        run: |
+          if [[ ! $PACKAGE_STATUS =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+            echo '::error title=Invalid status::Status must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.'
+            exit 1
+          fi
+          if [[ ! $CONTAINER_TAG =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]; then
+            echo '::error title=Invalid container tag::Container tag must start with a letter, digit, or underscore and contain up to 128 letters, digits, dots, underscores, or hyphens.'
+            exit 1
+          fi
+
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install SCons
+        if: matrix.platform != 'linux'
+        run: |
+          python -m pip install scons==4.9.1
+          python --version
+          scons --version
+
+      - name: Install Sentry CLI
+        if: matrix.platform != 'linux'
+        env:
+          SENTRY_CLI_VERSION: 3.8.0
+        run: |
+          npm install --global "@sentry/cli@$SENTRY_CLI_VERSION"
+          sentry-cli --version
+
+      - name: "Apple: Select Xcode 16.4"
+        if: matrix.platform == 'macos'
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer
+          xcodebuild -version
+
+      - name: "Apple: Install MoltenVK"
+        if: matrix.platform == 'macos'
+        env:
+          MOLTENVK_URL: https://github.com/godotengine/moltenvk-osxcross/releases/download/vulkan-sdk-1.3.283.0-2/MoltenVK-all.tar
+        run: |
+          mkdir -p deps/moltenvk
+          curl --fail --location --retry 3 \
+            --output deps/moltenvk.tar \
+            "$MOLTENVK_URL"
+          tar -xf deps/moltenvk.tar -C deps/moltenvk
+
+      - name: Log in to GHCR
+        if: matrix.platform == 'linux'
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build in container
+        if: matrix.platform == 'linux'
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/godot-builds-${{ matrix.platform }}:${{ env.CONTAINER_TAG }}
+        # Build scripts need GITHUB_ACTIONS to emit log groups inside the container.
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --env HOME=/tmp \
+            --env GITHUB_ACTIONS=true \
+            --env BUILD_NAME \
+            --env PACKAGE_STATUS \
+            --env PLATFORM \
+            --env BUILD_TARGET \
+            --volume "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
+            --workdir "$GITHUB_WORKSPACE" \
+            "$IMAGE" /bin/bash -c '
+              "./scripts/build-$PLATFORM.sh" --build-name "$BUILD_NAME" --status "$PACKAGE_STATUS" --target "$BUILD_TARGET"
+            '
+
+      - name: "Windows: Build"
+        if: matrix.platform == 'windows'
+        run: ./scripts/build-windows.sh --build-name "$BUILD_NAME" --status "$PACKAGE_STATUS" --target "$BUILD_TARGET"
+
+      - name: "macOS: Build"
+        if: matrix.platform == 'macos'
+        run: |
+          ./scripts/build-macos.sh --build-name "$BUILD_NAME" --status "$PACKAGE_STATUS" --target "$BUILD_TARGET" \
+            "vulkan_sdk_path=$GITHUB_WORKSPACE/deps/moltenvk/MoltenVK/MoltenVK/static/MoltenVK.xcframework"
+
+      - name: Archive build artifacts
+        # Tar preserves executable permissions when transferring build artifacts.
+        run: tar -cf "artifacts/godot-build-$PLATFORM-$BUILD_TARGET.tar" artifacts/*/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: godot-build-${{ matrix.platform }}-${{ matrix.target }}
+          path: artifacts/godot-build-${{ matrix.platform }}-${{ matrix.target }}.tar
+          if-no-files-found: error
+
+  package:
+    name: Package ${{ matrix.platform }}
+    needs: build
+    # Package successful platforms even if another build job failed.
+    if: ${{ !cancelled() }}
+    runs-on: ${{ matrix.platform == 'macos' && 'macos-latest' || 'ubuntu-latest' }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [linux, windows, macos]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: godot-build-${{ matrix.platform }}-*
+          path: artifacts
+          merge-multiple: true
+
+      - name: Extract build artifacts
+        run: |
+          for archive in artifacts/*.tar; do
+            tar -xf "$archive"
+            rm "$archive"
+          done
+
+      - name: Package Godot
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          "./scripts/package-$PLATFORM.sh" --status "$PACKAGE_STATUS"
+
+      - name: Upload packages
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: godot-${{ inputs.status }}-${{ matrix.platform }}
+          path: packages/**/*.zip
+          if-no-files-found: error
+          compression-level: 0
