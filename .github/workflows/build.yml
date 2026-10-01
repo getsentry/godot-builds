@@ -30,7 +30,7 @@ defaults:
 jobs:
   build:
     name: Build ${{ matrix.platform }} ${{ matrix.target }}
-    runs-on: ${{ matrix.platform == 'windows' && 'windows-latest' || matrix.platform == 'macos' && 'macos-latest' || 'ubuntu-latest' }}
+    runs-on: ${{ matrix.platform == 'windows' && 'windows-2022' || matrix.platform == 'macos' && 'macos-15' || 'ubuntu-latest' }}
     timeout-minutes: 360
     strategy:
       fail-fast: false
@@ -145,7 +145,7 @@ jobs:
     needs: build
     # Package successful platforms even if another build job failed.
     if: ${{ !cancelled() }}
-    runs-on: ${{ matrix.platform == 'macos' && 'macos-latest' || 'ubuntu-latest' }}
+    runs-on: ${{ matrix.platform == 'macos' && 'macos-15' || 'ubuntu-latest' }}
     timeout-minutes: 60
     strategy:
       fail-fast: false
