@@ -50,3 +50,19 @@ defaults to `custom`; pass the same name used for the build:
 Each platform produces an editor archive and its template archives under
 `packages/<version>/`. Every archive has a matching `.debug-symbols.zip` archive
 containing its debug files and source bundles.
+
+To build the Linux container locally:
+
+```bash
+docker build --platform linux/amd64 --file containers/Dockerfile.linux --tag godot-build-linux:latest containers
+```
+
+Use the [build-containers.yml](.github/workflows/build-containers.yml) workflow to
+publish the Linux toolchain image to
+`ghcr.io/<owner>/godot-builds-linux`. Use the `main` ref when dispatching
+the workflow to also update the `4.5-latest` tag.
+
+Use the [build.yml](.github/workflows/build.yml) workflow to build and package
+all desktop targets. Supply `status` and optionally choose a published
+`container_tag` for Linux. The workflow produces binary and debug-symbol
+packages as artifacts for each platform.
