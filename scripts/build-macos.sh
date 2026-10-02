@@ -14,6 +14,7 @@ SCONS="${SCONS:-scons}"
 
 source "$SCRIPT_DIR/common.sh"
 source "$SCRIPT_DIR/build-common.sh"
+source "$SCRIPT_DIR/build-deps.sh"
 
 SCONS_ARGS=("${DEFAULT_SCONS_ARGS[@]}")
 BUILD_TARGETS=()
@@ -25,6 +26,8 @@ ARTIFACT_DIR="$REPO_ROOT/artifacts/$GODOT_VERSION/$ARTIFACT_PLATFORM"
 main() {
     require_command "dsymutil"
     require_command "$SCONS"
+    download_build_dependencies
+    SCONS_ARGS=("${DEPENDENCY_SCONS_ARGS[@]}" "${SCONS_ARGS[@]}")
     cd "$GODOT_DIR"
 
     local failed_targets=()
