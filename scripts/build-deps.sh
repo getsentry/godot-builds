@@ -68,6 +68,8 @@ download_dependency() (
 )
 
 download_build_dependencies() {
+    log_step "Preparing build dependencies..."
+
     local deps_dir="$REPO_ROOT/deps"
     local accesskit_dir="$deps_dir/accesskit/$ACCESSKIT_VERSION"
     # Replace the slash with a hyphen so the version is a single directory name.
