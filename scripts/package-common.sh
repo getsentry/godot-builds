@@ -8,8 +8,8 @@ Package staged Godot editors and export templates into binary and debug-symbol
 ZIP archives under packages/<version>/.
 
 Options:
-  -h, --help        Show this help and exit.
-  --status STATUS   Set the package version status (default: pinned Godot tag).
+  -h, --help          Show this help and exit.
+  --build-name NAME   Set the build name in package filenames (default: custom).
 EOF
 }
 
@@ -24,8 +24,7 @@ get_godot_release() {
 }
 
 parse_package_arguments() {
-    PACKAGE_STATUS=""
-    local status_set=false
+    GODOT_BUILD_NAME="custom"
 
     while (($# > 0)); do
         case "$1" in
@@ -33,25 +32,23 @@ parse_package_arguments() {
                 usage
                 exit 0
                 ;;
-            --status)
+            --build-name)
                 if (($# < 2)); then
-                    die "Option '--status' requires a value"
+                    die "Option '--build-name' requires a value"
                 fi
-                PACKAGE_STATUS=$2
-                status_set=true
+                GODOT_BUILD_NAME=$2
                 shift 2
                 ;;
-            --status=*)
-                PACKAGE_STATUS=${1#*=}
-                status_set=true
+            --build-name=*)
+                GODOT_BUILD_NAME=${1#*=}
                 shift
                 ;;
             *) die "Unknown option '$1'" ;;
         esac
     done
 
-    if [[ $status_set == true && -z $PACKAGE_STATUS ]]; then
-        die "Option '--status' requires a non-empty value"
+    if [[ -z $GODOT_BUILD_NAME ]]; then
+        die "Option '--build-name' requires a non-empty value"
     fi
 }
 

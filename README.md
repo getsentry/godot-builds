@@ -39,11 +39,11 @@ Package the staged artifacts from the repository root:
 ./scripts/package-macos.sh
 ```
 
-Package names use the status from the pinned Godot tag by default. Pass the
-same custom status used for the build when packaging custom releases:
+Package names include the pinned Godot tag and the build name (default: `custom`).
+Pass the same build name used for the build:
 
 ```bash
-./scripts/package-linux.sh --status sentry.0
+./scripts/package-linux.sh --build-name sentry.1
 ```
 
 Each platform produces an editor archive and its template archives under
