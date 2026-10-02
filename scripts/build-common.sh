@@ -19,7 +19,6 @@ Build Godot editors and export templates for $ARTIFACT_PLATFORM.
 Options:
   -h, --help          Show this help and exit.
   --build-name NAME   Set the build name (default: custom).
-  --status STATUS     Override the version status from the Godot source.
   --target TARGET     Build editor, template_debug, or template_release.
                       Repeat to select multiple targets; defaults to all three.
   --                  Forward remaining arguments directly to SCons.
@@ -50,7 +49,6 @@ add_build_target() {
 
 parse_build_arguments() {
     GODOT_BUILD_NAME="custom"
-    BUILD_STATUS=""
 
     while (($# > 0)); do
         case "$1" in
@@ -67,17 +65,6 @@ parse_build_arguments() {
                 ;;
             --build-name=*)
                 GODOT_BUILD_NAME=${1#*=}
-                shift
-                ;;
-            --status)
-                if (($# < 2)); then
-                    die "Option '--status' requires a value"
-                fi
-                BUILD_STATUS=$2
-                shift 2
-                ;;
-            --status=*)
-                BUILD_STATUS=${1#*=}
                 shift
                 ;;
             --target)
@@ -175,11 +162,6 @@ run_scons_build() {
     local exit_code=0
     (
         export BUILD_NAME="$GODOT_BUILD_NAME"
-        if [[ -n $BUILD_STATUS ]]; then
-            export GODOT_VERSION_STATUS="$BUILD_STATUS"
-        else
-            unset GODOT_VERSION_STATUS
-        fi
 
         rm -rf -- bin || exit $?
 

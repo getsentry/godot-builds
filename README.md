@@ -10,11 +10,11 @@ Build the pinned Godot source from the repository root:
 
 Additional arguments are forwarded to every SCons invocation.
 
-The build name defaults to `custom`. Pass `--status` to override the version
-status from the Godot source:
+The build name defaults to `custom`. Pass `--build-name` to identify the build
+in the engine's full version string:
 
 ```bash
-./scripts/build-linux.sh --build-name sentry --status sentry.0
+./scripts/build-linux.sh --build-name sentry.1
 ```
 
 By default, each script builds the editor and both export templates. Pass
