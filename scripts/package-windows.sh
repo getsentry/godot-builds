@@ -20,7 +20,7 @@ GODOT_VERSION=${GODOT_RELEASE%%-*}
 ARTIFACT_DIR="$REPO_ROOT/artifacts/$GODOT_VERSION/windows"
 PACKAGE_DIR="$REPO_ROOT/packages/$GODOT_VERSION"
 STAGING_ROOT="$PACKAGE_DIR/.staging-windows"
-PACKAGE_BASENAME="Godot_v$GODOT_RELEASE-$GODOT_BUILD_NAME"
+PACKAGE_BASENAME="Godot_v${GODOT_RELEASE}_$GODOT_BUILD_NAME"
 
 trap 'rm -rf "$STAGING_ROOT"' EXIT
 
@@ -53,14 +53,14 @@ main() {
     local editor_binary
     editor_binary=$(get_artifact_binary "$editor_dir" ".exe")
     local editor_console="${editor_binary%.exe}.console.exe"
-    local editor_name="${PACKAGE_BASENAME}_win64.exe"
-    local editor_console_name="${PACKAGE_BASENAME}_win64_console.exe"
+    local editor_name="${PACKAGE_BASENAME}_editor.windows.$TARGET_ARCH"
+    local editor_console_name="$editor_name.console.exe"
     local editor_staging_dir
 
     editor_staging_dir=$(create_staging_directory)
 
     log_step "Packaging Windows editor..."
-    stage_package_entry "$editor_binary" "$editor_staging_dir/$editor_name"
+    stage_package_entry "$editor_binary" "$editor_staging_dir/$editor_name.exe"
     if [[ -f $editor_console ]]; then
         stage_package_entry "$editor_console" "$editor_staging_dir/$editor_console_name"
     fi
@@ -88,7 +88,7 @@ main() {
         template_console="${template_binary%.exe}.console.exe"
         template_name="windows_${target}_$TARGET_ARCH.exe"
         template_console_name="windows_${target}_${TARGET_ARCH}_console.exe"
-        package_name="${PACKAGE_BASENAME}_windows_${target}_$TARGET_ARCH"
+        package_name="${PACKAGE_BASENAME}_template.$target.windows.$TARGET_ARCH"
         template_staging_dir=$(create_staging_directory)
 
         log_step "Packaging Windows $target template..."

@@ -39,8 +39,9 @@ Package the staged artifacts from the repository root:
 ./scripts/package-macos.sh
 ```
 
-Package names include the pinned Godot tag and the build name (default: `custom`).
-Pass the same build name used for the build:
+Package names include the pinned Godot tag and build name, such as
+`Godot_v4.5.2-stable_sentry.1_editor.macos.universal.zip`. The build name
+defaults to `custom`; pass the same name used for the build:
 
 ```bash
 ./scripts/package-linux.sh --build-name sentry.1

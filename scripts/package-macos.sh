@@ -20,7 +20,7 @@ GODOT_VERSION=${GODOT_RELEASE%%-*}
 ARTIFACT_DIR="$REPO_ROOT/artifacts/$GODOT_VERSION/macos"
 PACKAGE_DIR="$REPO_ROOT/packages/$GODOT_VERSION"
 STAGING_ROOT="$PACKAGE_DIR/.staging-macos"
-PACKAGE_BASENAME="Godot_v$GODOT_RELEASE-$GODOT_BUILD_NAME"
+PACKAGE_BASENAME="Godot_v${GODOT_RELEASE}_$GODOT_BUILD_NAME"
 
 trap 'rm -rf "$STAGING_ROOT"' EXIT
 
@@ -46,7 +46,7 @@ main() {
     local editor_arm64 editor_x86_64
     editor_arm64=$(get_artifact_binary "$ARTIFACT_DIR/editor/arm64")
     editor_x86_64=$(get_artifact_binary "$ARTIFACT_DIR/editor/x86_64")
-    local editor_name="${PACKAGE_BASENAME}_macos.universal"
+    local editor_name="${PACKAGE_BASENAME}_editor.macos.universal"
     local editor_staging_dir
     local editor_app
     local editor_executable
@@ -70,7 +70,7 @@ main() {
 
     # Packaging export templates.
 
-    local template_name="${PACKAGE_BASENAME}_macos.templates.universal"
+    local template_name="${PACKAGE_BASENAME}_templates.macos.universal"
     local template_staging_dir
     local template_app
     local template_executable_dir

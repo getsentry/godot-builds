@@ -20,7 +20,7 @@ GODOT_VERSION=${GODOT_RELEASE%%-*}
 ARTIFACT_DIR="$REPO_ROOT/artifacts/$GODOT_VERSION/linux"
 PACKAGE_DIR="$REPO_ROOT/packages/$GODOT_VERSION"
 STAGING_ROOT="$PACKAGE_DIR/.staging-linux"
-PACKAGE_BASENAME="Godot_v$GODOT_RELEASE-$GODOT_BUILD_NAME"
+PACKAGE_BASENAME="Godot_v${GODOT_RELEASE}_$GODOT_BUILD_NAME"
 
 trap 'rm -rf "$STAGING_ROOT"' EXIT
 
@@ -32,7 +32,7 @@ main() {
 
     local editor_binary
     editor_binary=$(get_artifact_binary "$ARTIFACT_DIR/editor/$TARGET_ARCH")
-    local editor_name="${PACKAGE_BASENAME}_linux.$TARGET_ARCH"
+    local editor_name="${PACKAGE_BASENAME}_editor.linux.$TARGET_ARCH"
 
     log_step "Packaging Linux editor..."
     create_file_package \
@@ -53,7 +53,7 @@ main() {
     for target in debug release; do
         template_name="linux_${target}.$TARGET_ARCH"
         template_binary=$(get_artifact_binary "$ARTIFACT_DIR/template_$target/$TARGET_ARCH")
-        package_name="${PACKAGE_BASENAME}_$template_name"
+        package_name="${PACKAGE_BASENAME}_template.$target.linux.$TARGET_ARCH"
 
         log_step "Packaging Linux $target template..."
         create_file_package \
