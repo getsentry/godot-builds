@@ -54,7 +54,6 @@ jobs:
             godot-build-linux:test \
             ./scripts/build-linux.sh \
             --build-name ci \
-            --status ci \
             --target template_release
 
       - name: Log in to GHCR

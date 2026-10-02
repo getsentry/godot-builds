@@ -63,6 +63,7 @@ publish the Linux toolchain image to
 the workflow to also update the `4.5-latest` tag.
 
 Use the [build.yml](.github/workflows/build.yml) workflow to build and package
-all desktop targets. Supply `status` and optionally choose a published
-`container_tag` for Linux. The workflow produces binary and debug-symbol
-packages as artifacts for each platform.
+all desktop targets. Supply a `build_name` and optionally choose a published
+`container_tag` for Linux builds. Increment the build name to `sentry.2`,
+`sentry.3`, etc. for subsequent releases of the same Godot version. The workflow
+produces binary and debug-symbol packages as artifacts for each platform.

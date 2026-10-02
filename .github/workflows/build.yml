@@ -3,10 +3,10 @@ name: Build Godot
 on:
   workflow_dispatch:
     inputs:
-      status:
-        description: Godot version status
+      build_name:
+        description: Godot build name
         required: true
-        default: sentry.0
+        default: sentry.1
         type: string
       container_tag:
         description: Published Linux toolchain tag (4.5-latest or sha-<commit>)
@@ -19,8 +19,7 @@ permissions:
   packages: read
 
 env:
-  BUILD_NAME: sentry
-  PACKAGE_STATUS: ${{ inputs.status }}
+  BUILD_NAME: ${{ inputs.build_name }}
   CONTAINER_TAG: ${{ inputs.container_tag }}
 
 defaults:
@@ -44,8 +43,8 @@ jobs:
     steps:
       - name: Validate inputs
         run: |
-          if [[ ! $PACKAGE_STATUS =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
-            echo '::error title=Invalid status::Status must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.'
+          if [[ ! $BUILD_NAME =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+            echo '::error title=Invalid build name::Build name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.'
             exit 1
           fi
           if [[ ! $CONTAINER_TAG =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]; then
@@ -110,23 +109,22 @@ jobs:
             --env HOME=/tmp \
             --env GITHUB_ACTIONS=true \
             --env BUILD_NAME \
-            --env PACKAGE_STATUS \
             --env PLATFORM \
             --env BUILD_TARGET \
             --volume "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
             --workdir "$GITHUB_WORKSPACE" \
             "$IMAGE" /bin/bash -c '
-              "./scripts/build-$PLATFORM.sh" --build-name "$BUILD_NAME" --status "$PACKAGE_STATUS" --target "$BUILD_TARGET"
+              "./scripts/build-$PLATFORM.sh" --build-name "$BUILD_NAME" --target "$BUILD_TARGET"
             '
 
       - name: "Windows: Build"
         if: matrix.platform == 'windows'
-        run: ./scripts/build-windows.sh --build-name "$BUILD_NAME" --status "$PACKAGE_STATUS" --target "$BUILD_TARGET"
+        run: ./scripts/build-windows.sh --build-name "$BUILD_NAME" --target "$BUILD_TARGET"
 
       - name: "macOS: Build"
         if: matrix.platform == 'macos'
         run: |
-          ./scripts/build-macos.sh --build-name "$BUILD_NAME" --status "$PACKAGE_STATUS" --target "$BUILD_TARGET" \
+          ./scripts/build-macos.sh --build-name "$BUILD_NAME" --target "$BUILD_TARGET" \
             "vulkan_sdk_path=$GITHUB_WORKSPACE/deps/moltenvk/MoltenVK/MoltenVK/static/MoltenVK.xcframework"
 
       - name: Archive build artifacts
@@ -177,12 +175,12 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
         run: |
-          "./scripts/package-$PLATFORM.sh" --status "$PACKAGE_STATUS"
+          "./scripts/package-$PLATFORM.sh" --build-name "$BUILD_NAME"
 
       - name: Upload packages
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: godot-${{ inputs.status }}-${{ matrix.platform }}
+          name: godot-${{ env.BUILD_NAME }}-${{ matrix.platform }}
           path: packages/**/*.zip
           if-no-files-found: error
           compression-level: 0
