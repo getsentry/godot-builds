@@ -34,3 +34,9 @@ require_command() {
         die "Required command '$1' was not found"
     fi
 }
+
+require_path() {
+    if [[ ! -e $1 ]]; then
+        die "Required path '$1' was not found"
+    fi
+}

@@ -30,3 +30,23 @@ The available targets are `editor`, `template_debug`, and `template_release`.
 Successful builds place binaries, debug symbols, and source bundles into
 `artifacts/<version>/<platform>/<target>/<architecture>/`. This layout lets CI
 jobs build targets independently and merge their artifacts afterward.
+
+Package the staged artifacts from the repository root:
+
+```bash
+./scripts/package-linux.sh
+./scripts/package-windows.sh
+./scripts/package-macos.sh
+```
+
+Package names include the pinned Godot tag and build name, such as
+`Godot_v4.5.2-stable_sentry.1_editor.macos.universal.zip`. The build name
+defaults to `custom`; pass the same name used for the build:
+
+```bash
+./scripts/package-linux.sh --build-name sentry.1
+```
+
+Each platform produces an editor archive and its template archives under
+`packages/<version>/`. Every archive has a matching `.debug-symbols.zip` archive
+containing its debug files and source bundles.
