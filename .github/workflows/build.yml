@@ -65,6 +65,16 @@ jobs:
           python --version
           scons --version
 
+      - name: "Windows: Install gettext"
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $true
+          choco install gettext --yes --no-progress
+          $gettextBin = "$env:ProgramFiles\gettext-iconv\bin"
+          $gettextBin >> $env:GITHUB_PATH
+          & "$gettextBin\msgfmt.exe" --version
+
       - name: Install Sentry CLI
         if: matrix.platform != 'linux'
         env:
