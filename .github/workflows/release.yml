@@ -1,0 +1,54 @@
+name: Draft Godot build release
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_name:
+        description: Godot build name (sentry.1, sentry.2, etc.)
+        required: true
+        default: sentry.1
+        type: string
+
+concurrency:
+  group: release-${{ inputs.build_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build:
+    name: Build and package Godot
+    uses: ./.github/workflows/build.yml
+    with:
+      build_name: ${{ inputs.build_name }}
+
+  release:
+    name: Create draft release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      BUILD_NAME: ${{ inputs.build_name }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Download packages
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: godot-${{ inputs.build_name }}-*
+          path: packages
+          merge-multiple: true
+
+      - name: Tag and create draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: ./scripts/draft-release.sh "$BUILD_NAME"

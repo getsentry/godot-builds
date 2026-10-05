@@ -13,6 +13,16 @@ on:
         required: true
         default: 4.5-latest
         type: string
+  workflow_call:
+    inputs:
+      build_name:
+        description: Godot build name
+        required: true
+        type: string
+      container_tag:
+        description: Published Linux toolchain tag (4.5-latest or sha-<commit>)
+        default: 4.5-latest
+        type: string
 
 permissions:
   contents: read
