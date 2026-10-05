@@ -1,0 +1,61 @@
+name: Draft Godot build release
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_name:
+        description: Godot build name (sentry.1, sentry.2, etc.)
+        required: true
+        default: sentry.1
+        type: string
+
+concurrency:
+  group: release-${{ inputs.build_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build:
+    name: Build and package Godot
+    uses: ./.github/workflows/build.yml
+    with:
+      build_name: ${{ inputs.build_name }}
+
+  release:
+    name: Create draft release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    env:
+      BUILD_NAME: ${{ inputs.build_name }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Upload packages incrementally to draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          source scripts/common.sh
+          godot_version=$(get_godot_version godot)
+          artifacts=$(gh api --paginate \
+            "repos/{owner}/{repo}/actions/runs/$GITHUB_RUN_ID/artifacts?per_page=100" \
+            | jq -r --arg prefix "godot-$BUILD_NAME-" \
+              '.artifacts[] | select(.name | startswith($prefix)) | .name')
+          [[ -n $artifacts ]] || die "No package artifacts were found"
+
+          while IFS= read -r artifact; do
+            gh run download "$GITHUB_RUN_ID" --name "$artifact" --dir packages
+            ./scripts/draft-release.sh "$BUILD_NAME"
+            rm -rf "packages/$godot_version"
+          done <<< "$artifacts"

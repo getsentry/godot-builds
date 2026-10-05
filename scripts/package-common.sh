@@ -13,16 +13,6 @@ Options:
 EOF
 }
 
-get_godot_release() {
-    local godot_dir=$1
-    local release
-
-    require_command "git"
-    release=$(git -C "$godot_dir" describe --tags --exact-match HEAD) ||
-        die "Godot is not checked out at an exact version tag"
-    printf '%s\n' "$release"
-}
-
 parse_package_arguments() {
     GODOT_BUILD_NAME="custom"
 
