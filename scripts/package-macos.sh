@@ -15,12 +15,11 @@ source "$SCRIPT_DIR/common.sh"
 source "$SCRIPT_DIR/package-common.sh"
 
 parse_package_arguments "$@"
-GODOT_RELEASE=$(get_godot_release "$GODOT_DIR")
-GODOT_VERSION=${GODOT_RELEASE%%-*}
+GODOT_VERSION=$(get_godot_version "$GODOT_DIR")
 ARTIFACT_DIR="$REPO_ROOT/artifacts/$GODOT_VERSION/macos"
 PACKAGE_DIR="$REPO_ROOT/packages/$GODOT_VERSION"
 STAGING_ROOT="$PACKAGE_DIR/.staging-macos"
-PACKAGE_BASENAME="Godot_v${GODOT_RELEASE}_$GODOT_BUILD_NAME"
+PACKAGE_BASENAME="Godot_v${GODOT_VERSION}_$GODOT_BUILD_NAME"
 
 trap 'rm -rf "$STAGING_ROOT"' EXIT
 

@@ -40,3 +40,13 @@ require_path() {
         die "Required path '$1' was not found"
     fi
 }
+
+get_godot_version() {
+    local godot_dir=$1
+    local version
+
+    require_command "git"
+    version=$(git -C "$godot_dir" describe --tags --exact-match HEAD) ||
+        die "Godot is not checked out at an exact version tag"
+    printf '%s\n' "$version"
+}

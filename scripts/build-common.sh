@@ -98,16 +98,6 @@ parse_build_arguments() {
     fi
 }
 
-get_godot_version() {
-    local godot_dir=$1
-    local version
-
-    require_command "git"
-    version=$(git -C "$godot_dir" describe --tags --exact-match HEAD) ||
-        die "Godot is not checked out at an exact version tag"
-    printf '%s\n' "${version%%-*}"
-}
-
 move_build_artifacts() {
     local artifact_dir=$1
     local artifact_path=${artifact_dir#"$REPO_ROOT"/}
