@@ -67,3 +67,17 @@ all desktop targets. Supply a `build_name` and optionally choose a published
 `container_tag` for Linux builds. Increment the build name to `sentry.2`,
 `sentry.3`, etc. for subsequent releases of the same Godot version. The workflow
 produces binary and debug-symbol packages as artifacts for each platform.
+
+Use the [release.yml](.github/workflows/release.yml) workflow to prepare a draft
+release. Supply a `build_name`, such as `sentry.1`.
+The workflow builds and packages Godot, then validates the packages and tags
+the selected commit as
+`godot-<version>-<status>-<build-name>` using the full pinned Godot tag, and uploads
+the packages to a draft GitHub release.
+
+To tag the current commit and upload existing packages to a draft release
+locally, run:
+
+```bash
+./scripts/draft-release.sh sentry.1
+```
